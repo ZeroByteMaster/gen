@@ -1,12 +1,91 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-import base64
+import random
+import os
 
-c = "aW1wb3J0IHJhbmRvbQppbXBvcnQgb3MKaW1wb3J0IHN1YnByb2Nlc3MKCmRlZiBydW5jKHRleHQpOgogICAgcHJvY2VzbyA9IHN1YnByb2Nlc3MuUG9wZW4oWydsb2xjYXQnXSwgc3RkaW49c3VicHJvY2Vzcy5QSVBFKQogICAgcHJvY2Vzby5jb21tdW5pY2F0ZShpbnB1dD10ZXh0LmVuY29kZSgpKQoKZGVmIGlucHV0X2xvbGNhdChwcm9tcHQpOgogICAgcnVuYyhwcm9tcHQpCiAgICByZXR1cm4gaW5wdXQoKQoKZGVmIEdOQSgpOgogICAgcmV0dXJuICcnLmpvaW4oW3N0cihyYW5kb20ucmFuZGludCgwLCA5KSkgZm9yIF8gaW4gcmFuZ2UoMTYpXSkKCmRlZiBHRVgoKToKICAgIG1vbnRoID0gc3RyKHJhbmRvbS5yYW5kaW50KDEsIDExKSkuemZpbGwoMikKICAgIHllYXIgPSByYW5kb20ucmFuZGludCgyMSwgMjYpCiAgICByZXR1cm4gZiJ7bW9udGh9L3t5ZWFyfSIKCmRlZiBHQ0MoKToKICAgIHJldHVybiAnJy5qb2luKFtzdHIocmFuZG9tLnJhbmRpbnQoMSwgOSkpIGZvciBfIGluIHJhbmdlKDMpXSkKCmRlZiBHTlAoKToKICAgIHN0YXJ0ID0gc3RyKHJhbmRvbS5yYW5kaW50KDExLCA4NikpLnpmaWxsKDIpCiAgICByZXN0ID0gJycuam9pbihbc3RyKHJhbmRvbS5yYW5kaW50KDAsIDkpKSBmb3IgXyBpbiByYW5nZSgxMCldKQogICAgcmV0dXJuIGYiK3tzdGFydH17cmVzdH0iCgpkZWYgR0JUKCk6CiAgICBtb250aCA9IHN0cihyYW5kb20ucmFuZGludCgxLCAxMikpLnpmaWxsKDIpCiAgICBkYXkgPSBzdHIocmFuZG9tLnJhbmRpbnQoMSwgMjgpKS56ZmlsbCgyKQogICAgeWVhciA9IHN0cihyYW5kb20ucmFuZGludCgxOTYzLCAyMDA2KSkKICAgIHJldHVybiBmInttb250aH0ve2RheX0ve3llYXJ9IgoKZGVmIEdOTSgpOgogICAgc3VybmFtZXMgPSBbIkdpbcOpbmV6IiwgIkZlcm7DoW5kZXoiLCAiR2FyY8OtYSIsICJMw7NwZXoiLCAiTWFydMOtbmV6IiwgIlDDqXJleiIsICJTw6FuY2hleiIsICJTdcOhcmV6IiwgIlRvcnJlcyIsICJEw61heiIsICJHw7NtZXoiLCAiVsOhenF1ZXoiLCAiQ2FzdHJvIiwgIk1vcmFsZXMiLCAiSmltw6luZXoiLCAiUnVpeiIsICJSYW3DrXJleiIsICJIZXJyZXJhIiwgIk1lZGluYSIsICJPcnRlZ2EiLCAiRGVsZ2FkbyIsICJIZXJuw6FuZGV6IiwgIsOBbHZhcmV6IiwgIk5hdmFycm8iLCAiTW9yZW5vIiwgIkd1ZXJyZXJvIiwgIkNhYnJlcmEiLCAiVmlkYWwiLCAiTWVuZG96YSIsICJQb25jZSIsICJTYWxhemFyIiwgIkFndWlsYXIiLCAiUm9qYXMiLCAiU2Vww7psdmVkYSIsICJRdWludGVybyIsICJDb250cmVyYXMiLCAiVmVnYSIsICJFc2NvYmFyIiwgIlNvdG8iLCAiVmFsZW56dWVsYSIsICJFc3Bpbm96YSIsICJNdcOxb3oiLCAiRmlndWVyb2EiLCAiQ2jDoXZleiIsICJSaXZhcyIsICJTdWFyZXoiLCAiTW9udG95YSIsICJGdWVudGVzIiwgIkNydXoiLCAiRmxvcmVzIiwgIk1hcnTDrW5leiIsICJHw7NtZXoiLCAiRnJhbmNvIiwgIlDDqXJleiIsICJMZcOzbiIsICJSZXllcyIsICJWYXJnYXMiLCAiUm9zYWxlcyIsICJDYW1wb3MiLCAiSWJhcnJhIiwgIkd1ZXJyZXJvIiwgIlNhbnRhbmEiLCAiVmFsZW5jaWEiLCAiQmVuw610ZXoiLCAiw4F2aWxhIiwgIkNlcnZhbnRlcyIsICJBY29zdGEiLCAiTGFyYSIsICJHYWxsZWdvcyIsICJPcm96Y28iLCAiQ2FycmlsbG8iLCAiQWd1aXJyZSIsICJWYWxsZSIsICJVcmliZSIsICJMdW5hIiwgIlBhY2hlY28iLCAiUm9jaGEiLCAiQ29ydMOpcyIsICJNb3JhIiwgIlLDrW9zIiwgIk5hdmFycm8iLCAiTW9yZW5vIiwgIkd1ZXJyZXJvIiwgIkNhYnJlcmEiLCAiVmlkYWwiLCAiTWVuZG96YSIsICJQb25jZSIsICJTYWxhemFyIiwgIkFndWlsYXIiLCAiUm9qYXMiLCAiU2Vww7psdmVkYSIsICJRdWludGVybyIsICJDb250cmVyYXMiLCAiVmVnYSIsICJFc2NvYmFyIiwgIlNvdG8iLCAiVmFsZW56dWVsYSIsICJFc3Bpbm96YSIsICJNdcOxb3oiLCAiRmlndWVyb2EiLCAiQ2jDoXZleiIsICJSaXZhcyIsICJTdWFyZXoiLCAiTW9udG95YSIsICJGdWVudGVzIiwgIkNydXoiLCAiRmxvcmVzIiwgIk1hcnTDrW5leiIsICJHw7NtZXoiLCAiRnJhbmNvIiwgIlDDqXJleiIsICJMZcOzbiIsICJSZXllcyIsICJWYXJnYXMiLCAiUm9zYWxlcyIsICJDYW1wb3MiLCAiSWJhcnJhIiwgIkd1ZXJyZXJvIl0KICAgIG5hbWVzID0gWyJEYW5pZWwiLCAiSnVsacOhbiIsICJFbWlsaWFubyIsICJKdWFuIiwgIlBlZHJvIiwgIkpvc2UiLCAiQW50b25pbyIsICJGcmFuY2lzY28iLCAiTHVpcyIsICJNYW51ZWwiLCAiSmF2aWVyIiwgIkNhcmxvcyIsICJTZXJnaW8iLCAiUmHDumwiLCAiRW1pbGlvIiwgIkJyYW5kb24iLCAiQW5hIiwgIlNvZsOtYSIsICJMYXVyYSIsICJNYXLDrWEiLCAiRWxpemFiZXRoIiwgIlNhbWlyYSIsICJSb2NpbyIsICJHYWJyaWVsIiwgIkZlcm5hbmRvIiwgIlZlcsOzbmljYSIsICJJc2FiZWxsYSIsICJEaWVnbyIsICJSb2JlcnRvIiwgIlZhbGVudGluYSIsICJGYWJpw6FuIiwgIkx1Y8OtYSIsICJBbmRyw6lzIiwgIkNhcm9saW5hIiwgIk1hcnRpbmEiLCAiR29uemFsbyIsICJDYW1pbGEiLCAiVG9tw6FzIiwgIlZpY3RvcmlhIiwgIk1hdMOtYXMiLCAiQWxlamFuZHJhIiwgIk1heGltaWxpYW5vIiwgIlZhbGVyaWEiLCAiRWR1YXJkbyIsICJKdWxpYSIsICJOaWNvbMOhcyIsICJNYXJpYW5hIiwgIlJhZmFlbCIsICJDYXRhbGluYSIsICJMZWFuZHJvIiwgIkFkcmlhbmEiLCAiU2ViYXN0acOhbiIsICJEYW5pZWxhIiwgIkZhY3VuZG8iLCAiTWFyZ2FyaXRhIiwgIkxvcmVuem8iLCAiQWJyaWwiLCAiRmVsaXBlIiwgIlNvbGFuZ2UiLCAiQmVuamFtw61uIiwgIlJlbmF0YSIsICJQZWRybyIsICJDb25zdGFuemEiLCAiw4FuZ2VsIiwgIkFudG9uaWEiLCAiR2FicmllbGEiLCAiSHVnbyIsICJSZW7DqSIsICJQYWxvbWEiLCAiUm9kcmlnbyIsICJFbGVuYSIsICJGZWRlcmljbyIsICJKdWxpYW5hIiwgIklnbmFjaW8iLCAiUGF1bGEiLCAiTWFydMOtbiIsICJCZWF0cml6IiwgIk1hdGlsZGUiLCAiRnJhbmNpc2NhIiwgIkVzdGViYW4iLCAiUmVuw6kiLCAiUm9zYSIsICJBbGJlcnRvIiwgIlNpbHZpYSIsICJMZW9uYXJkbyIsICJOYXRhbGlhIiwgIkJydW5vIiwgIlZhbGVudMOtbiIsICJKdWxpYW5hIiwgIkdpc2VsYSIsICJGZXJuYW5kbyIsICJDZWNpbGlhIiwgIkFndXN0w61uIiwgIk1hcmluYSJdCiAgICByZXR1cm4gZiJ7cmFuZG9tLmNob2ljZShuYW1lcyl9IHtyYW5kb20uY2hvaWNlKHN1cm5hbWVzKX0iCgpkZWYgR0JLKCk6CiAgICBiYW5rcyA9IFsiQkJWQSIsICJCYW5hbWV4IiwgIlNhbnRhbmRlciIsICJCYW5vcnRlIiwgIkhTQkMiLCAiU2NvdGlhYmFuayIsICJJbmJ1cnNhIiwgIkNpdGliYW5hbWV4IiwgIklYRSIsICJBenRlY2EiLCAiQmFuY28gZGVsIEJhasOtbyIsICJBZmlybWUiLCAiQmFuY28gU2FudGFuZGVyIE3DqXhpY28iLCAiQmFucmVnaW8iLCAiQmFuQ29wcGVsIiwgIkludmVybGF0IiwgIk1pZmVsIiwgIkJhbmNvbWV4dCIsICJBY3RpbnZlciIsICJWZSBwb3IgTcOhcyIsICJCYW5jbyBBenRlY2EiLCAiQ0lCYW5jbyIsICJCYW5vcnRlLUl4ZSIsICJCYW5jbyBNdWx0aXZhIiwgIkJhbmNhIE1pZmVsIiwgIkludGVyY2FtIEJhbmNvIiwgIkJhbmthb29sIiwgIkJhbmNvIEZhbXNhIiwgIkJhbnNlZmkiLCAiQmFuY28gQWhvcnJvIEZhbXNhIiwgIk1vbmV4IiwgIkNJIEJhbmNvIiwgIkJhbmNvIElubW9iaWxpYXJpbyBNZXhpY2FubyIsICJCYW5zaSIsICJCYW5jcmVhIiwgIkJhbmplcmNpdG8iLCAiQmFuY28gQmFzZSIsICJCYW5jbyBGb3JqYWRvcmVzIiwgIkJhbmNvIEF1dG9maW4gTcOpeGljbyIsICJBQkMgQ2FwaXRhbCIsICJCYW5jbyBSZWdpb25hbCBkZSBNb250ZXJyZXkiLCAiQmFuY28gVmUgcG9yIE3DoXMiLCAiQmFub2JyYXMiLCAiQmFuY28gSW5idXJzYSIsICJCYW5jbyBNb25leCJdCiAgICByZXR1cm4gcmFuZG9tLmNob2ljZShiYW5rcykKCmRlZiBHTFYoKToKICAgIGxldmVscyA9IFsiR29sZCIsICJDbGFzc2ljIiwgIkJ1c2luZXNzIl0KICAgIHJldHVybiByYW5kb20uY2hvaWNlKGxldmVscykKCmRlZiBnZW5lcmFyX2FjYygpOgogICAgbmFtZSA9IEdOTSgpCiAgICBudW1fYWMgPSBHTkEoKQogICAgZXhwID0gR0VYKCkKICAgIGNjdiA9IEdDQygpCiAgICBiYW5rID0gR0JLKCkKICAgIGJpcnRoID0gR0JUKCkKICAgIHBob25lID0gR05QKCkKICAgIGxldmVsID0gR0xWKCkKICAgIAogICAgYWNjX2luZm8gPSBmIk5hbWU6IHtuYW1lfSB8IE51bSBBQzoge251bV9hY30gfCBFeHA6IHtleHB9IHwgQ0NWOiB7Y2N2fSB8IEJhbms6IHtiYW5rfSB8IEJpcnRoOiB7YmlydGh9IHwgTi4gUGhvbmU6IHtwaG9uZX0gfCBMZXZlbDoge2xldmVsfSIKICAgIHJldHVybiBhY2NfaW5mbwoKZGVmIG1haW4oKToKICAgIG9zLnN5c3RlbSgiY2xlYXIiKQogICAgcnVuYygiXG5QcmVzcyBlbnRlciB0byBjb250aW51ZSAtPj4gIikKICAgIGlucHV0KCkKICAgIGZpbGVuYW1lID0gaW5wdXRfbG9sY2F0KCJFbnRlciBmaWxlIG5hbWUgLT4+ICIpCiAgICBpZiBub3QgZmlsZW5hbWUuZW5kc3dpdGgoIi50eHQiKToKICAgICAgICBydW5jKCJFcnJvcjogT25seSAudHh0IGZpbGVzIGFyZSBzdXBwb3J0ZWQuIikKICAgICAgICByZXR1cm4KCiAgICB0cnk6CiAgICAgICAgbnVtX2FjY3MgPSBpbnQoaW5wdXRfbG9sY2F0KCJOdW1iZXIgb2YgYWNjcyB0byBnZW5lcmF0ZSAtPj4gIikpCiAgICBleGNlcHQgVmFsdWVFcnJvcjoKICAgICAgICBydW5jKCJFcnJvcjogUGxlYXNlIGVudGVyIGEgdmFsaWQgbnVtYmVyLiIpCiAgICAgICAgcmV0dXJuCiAgICAKICAgIGlmIG5vdCBvcy5wYXRoLmlzZmlsZShmaWxlbmFtZSk6CiAgICAgICAgd2l0aCBvcGVuKGZpbGVuYW1lLCAndycpIGFzIGZpbGU6CiAgICAgICAgICAgIGZpbGUud3JpdGUoIiIpCgogICAgd2l0aCBvcGVuKGZpbGVuYW1lLCAnYScpIGFzIGZpbGU6CiAgICAgICAgY3VycmVudF9saW5lcyA9IHN1bSgxIGZvciBfIGluIG9wZW4oZmlsZW5hbWUpKQogICAgICAgIGZvciBpIGluIHJhbmdlKG51bV9hY2NzKToKICAgICAgICAgICAgYWNjX2luZm8gPSBnZW5lcmFyX2FjYygpCiAgICAgICAgICAgIGZpbGUud3JpdGUoYWNjX2luZm8gKyAiXG4iKQogICAgICAgICAgICBydW5jKGYiTmV3IEFDIGdlbmVyYXRlZCBzdWNjZXNzZnVsbHkuIHwgQXJjaDoge2ZpbGVuYW1lfSAtIExpbmU6IHtjdXJyZW50X2xpbmVzICsgaSArIDF9IFxuIikKCmlmIF9fbmFtZV9fID09ICJfX21haW5fXyI6CiAgICBtYWluKCk="
+def ilolcat(prompt):
+    print(prompt)
+    return input()
 
-dc = base64.b64decode(c).decode('utf-8')
+def GCN():
+    ftd = random.choice(['4', '51', '52', '53', '54', '55', '34', '37'])
 
-exec(dc)
+    if ftd == '4' or ftd.startswith('5'):
+        restd = ''.join(random.choices('0123456789', k=16 - len(ftd)))
+    elif ftd.startswith('34') or ftd.startswith('37'):
+        restd = ''.join(random.choices('0123456789', k=15 - len(ftd)))
+    else:
+        restd = ''.join(random.choices('0123456789', k=14))
 
-# Thank you for purchasing. But an apology too.
+    cnumber = ftd + restd
+    return cnumber
+
+def GED():
+    month = random.randint(1, 12)
+    day = random.randint(1, 28)
+    year = random.randint(2025, 2027)
+    return f"{month:02}/{day:02}/{year}"
+
+def GCR():
+    names = ["Daniel", "Julián", "Emiliano", "Juan", "Pedro", "Jose", "Antonio", "Francisco", "Luis", "Manuel", "Javier", "Carlos", "Sergio", "Raúl", "Emilio", "Brandon", "Ana", "Sofía", "Laura", "María", "Elizabeth", "Samira", "Rocio", "Gabriel", "Fernando", "Verónica", "Isabella", "Diego", "Roberto", "Valentina", "Fabián", "Lucía", "Andrés", "Carolina", "Martina", "Gonzalo", "Camila", "Tomás", "Victoria", "Matías", "Alejandra", "Maximiliano", "Valeria", "Eduardo", "Julia", "Nicolás", "Mariana", "Rafael", "Catalina", "Leandro", "Adriana", "Sebastián", "Daniela", "Facundo", "Margarita", "Lorenzo", "Abril", "Felipe", "Solange", "Benjamín", "Renata", "Pedro", "Constanza", "Ángel", "Antonia", "Gabriela", "Hugo", "René", "Paloma", "Rodrigo", "Elena", "Federico", "Juliana", "Ignacio", "Paula", "Martín", "Beatriz", "Matilde", "Francisca", "Esteban", "René", "Rosa", "Alberto", "Silvia", "Leonardo", "Natalia", "Bruno", "Valentín", "Juliana", "Gisela", "Fernando", "Cecilia", "Agustín", "Marina"]
+    surnames = ["Giménez", "Fernández", "García", "López", "Martínez", "Pérez", "Sánchez", "Suárez", "Torres", "Díaz", "Gómez", "Vázquez", "Castro", "Morales", "Jiménez", "Ruiz", "Ramírez", "Herrera", "Medina", "Ortega", "Delgado", "Hernández", "Álvarez", "Navarro", "Moreno", "Guerrero", "Cabrera", "Vidal", "Mendoza", "Ponce", "Salazar", "Aguilar", "Rojas", "Sepúlveda", "Quintero", "Contreras", "Vega", "Escobar", "Soto", "Valenzuela", "Espinoza", "Muñoz", "Figueroa", "Chávez", "Rivas", "Suarez", "Montoya", "Fuentes", "Cruz", "Flores", "Martínez", "Gómez", "Franco", "Pérez", "León", "Reyes", "Vargas", "Rosales", "Campos", "Ibarra", "Guerrero"]
+    name = f"{random.choice(names)} {random.choice(surnames)}"
+    cnumber = GCN()
+    expiryd = GED()
+    cvv = ''.join(random.choices('123456789', k=3))
+    
+    if cnumber.startswith('4'):
+        ctype = "Visa"
+    elif cnumber.startswith(('51', '52', '53', '54', '55')):
+        ctype = "MasterCard"
+    elif cnumber.startswith(('34', '37')):
+        ctype = "American Express"
+    else:
+        ctype = "Unknown"
+
+    crinf = f'C. Number: {cnumber} | H. Name: {name} | CVV: {cvv} | Type: {ctype} | C. Expiry: {expiryd}'
+    return crinf
+
+def GCRs(num_crs):
+    crs = []
+    for _ in range(num_crs):
+        crinf = GCR()
+        crs.append(crinf)
+    return crs
+
+def WCTF(crs, filename):
+    clines = sum(1 for _ in open(filename))
+    
+    with open(filename, 'a') as file:
+        for i, acc_info in enumerate(crs, start=1):
+            file.write(acc_info + "\n")
+            if i == len(crs):
+                print(f"- New card generated successfully. | File: {filename} - Line: {clines + i} \n\n")
+            else:
+                print(f"- New card generated successfully. | File: {filename} - Line: {clines + i} \n")
+
+def main():
+    os.system("cls" if os.name == "nt" else "clear")
+    ilolcat("\nPress enter to continue ->> ")
+    filename = ilolcat("Enter file name ->> ")
+    if not filename.endswith(".txt"):
+        print("Error: Only .txt files are supported.")
+        return
+
+    try:
+        num_crs = int(ilolcat("Number of cards to generate ->> "))
+        print("")
+    except ValueError:
+        print("Error: Please enter a valid number.")
+        return
+    
+    if not os.path.isfile(filename):
+        with open(filename, 'w') as file:
+            file.write("")
+
+    crs = GCRs(num_crs)
+    WCTF(crs, filename)
+
+if __name__ == "__main__":
+    main()
